@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Struct",
+  "type": "object",
+  "required": [
+    "foo"
+  ],
+  "properties": {
+    "foo": {
+      "$ref": "#/definitions/custom"
+    }
+  },
+  "definitions": {
+    "custom": {
+      "type": "integer",
+      "maximum": 10.0,
+      "minimum": 0.0
+    }
+  }
+}

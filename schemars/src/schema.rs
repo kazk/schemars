@@ -7,6 +7,8 @@ use crate as schemars;
 #[cfg(feature = "impl_json_schema")]
 use crate::JsonSchema;
 use crate::{Map, Set};
+#[cfg(feature = "builder")]
+use derive_builder::Builder;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
@@ -111,9 +113,15 @@ pub struct RootSchema {
 /// A JSON Schema object.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
+#[cfg_attr(
+    feature = "builder",
+    derive(Builder),
+    builder(setter(into, strip_option), default)
+)]
 #[serde(rename_all = "camelCase", default)]
 pub struct SchemaObject {
     /// Properties which annotate the [`SchemaObject`] which typically have no effect when an object is being validated against the schema.
+    #[cfg_attr(feature = "builder", builder(setter(name = "with_metadata")))]
     #[serde(flatten, deserialize_with = "skip_if_default")]
     pub metadata: Option<Box<Metadata>>,
     /// The `type` keyword.
@@ -142,18 +150,23 @@ pub struct SchemaObject {
     )]
     pub const_value: Option<Value>,
     /// Properties of the [`SchemaObject`] which define validation assertions in terms of other schemas.
+    #[cfg_attr(feature = "builder", builder(setter(name = "subschemas_validation")))]
     #[serde(flatten, deserialize_with = "skip_if_default")]
     pub subschemas: Option<Box<SubschemaValidation>>,
     /// Properties of the [`SchemaObject`] which define validation assertions for numbers.
+    #[cfg_attr(feature = "builder", builder(setter(name = "number_validation")))]
     #[serde(flatten, deserialize_with = "skip_if_default")]
     pub number: Option<Box<NumberValidation>>,
     /// Properties of the [`SchemaObject`] which define validation assertions for strings.
+    #[cfg_attr(feature = "builder", builder(setter(name = "string_validation")))]
     #[serde(flatten, deserialize_with = "skip_if_default")]
     pub string: Option<Box<StringValidation>>,
     /// Properties of the [`SchemaObject`] which define validation assertions for arrays.
+    #[cfg_attr(feature = "builder", builder(setter(name = "array_validation")))]
     #[serde(flatten, deserialize_with = "skip_if_default")]
     pub array: Option<Box<ArrayValidation>>,
     /// Properties of the [`SchemaObject`] which define validation assertions for objects.
+    #[cfg_attr(feature = "builder", builder(setter(name = "object_validation")))]
     #[serde(flatten, deserialize_with = "skip_if_default")]
     pub object: Option<Box<ObjectValidation>>,
     /// The `$ref` keyword.
@@ -232,6 +245,13 @@ impl SchemaObject {
     get_or_insert_default_fn!(object, ObjectValidation);
 }
 
+#[cfg(feature = "builder")]
+impl SchemaObject {
+    pub fn builder() -> SchemaObjectBuilder {
+        Default::default()
+    }
+}
+
 impl From<Schema> for SchemaObject {
     fn from(schema: Schema) -> Self {
         schema.into_object()
@@ -241,6 +261,11 @@ impl From<Schema> for SchemaObject {
 /// Properties which annotate a [`SchemaObject`] which typically have no effect when an object is being validated against the schema.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
+#[cfg_attr(
+    feature = "builder",
+    derive(Builder),
+    builder(setter(into, strip_option), default)
+)]
 #[serde(rename_all = "camelCase", default)]
 pub struct Metadata {
     /// The `$id` keyword.
@@ -296,6 +321,11 @@ fn is_false(b: &bool) -> bool {
 /// Properties of a [`SchemaObject`] which define validation assertions in terms of other schemas.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
+#[cfg_attr(
+    feature = "builder",
+    derive(Builder),
+    builder(setter(into, strip_option), default)
+)]
 #[serde(rename_all = "camelCase", default)]
 pub struct SubschemaValidation {
     /// The `allOf` keyword.
@@ -335,9 +365,21 @@ pub struct SubschemaValidation {
     pub else_schema: Option<Box<Schema>>,
 }
 
+#[cfg(feature = "builder")]
+impl SubschemaValidation {
+    pub fn builder() -> SubschemaValidationBuilder {
+        Default::default()
+    }
+}
+
 /// Properties of a [`SchemaObject`] which define validation assertions for numbers.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
+#[cfg_attr(
+    feature = "builder",
+    derive(Builder),
+    builder(setter(into, strip_option), default)
+)]
 #[serde(rename_all = "camelCase", default)]
 pub struct NumberValidation {
     /// The `multipleOf` keyword.
@@ -367,9 +409,21 @@ pub struct NumberValidation {
     pub exclusive_minimum: Option<f64>,
 }
 
+#[cfg(feature = "builder")]
+impl NumberValidation {
+    pub fn builder() -> NumberValidationBuilder {
+        Default::default()
+    }
+}
+
 /// Properties of a [`SchemaObject`] which define validation assertions for strings.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
+#[cfg_attr(
+    feature = "builder",
+    derive(Builder),
+    builder(setter(into, strip_option), default)
+)]
 #[serde(rename_all = "camelCase", default)]
 pub struct StringValidation {
     /// The `maxLength` keyword.
@@ -389,9 +443,21 @@ pub struct StringValidation {
     pub pattern: Option<String>,
 }
 
+#[cfg(feature = "builder")]
+impl StringValidation {
+    pub fn builder() -> StringValidationBuilder {
+        Default::default()
+    }
+}
+
 /// Properties of a [`SchemaObject`] which define validation assertions for arrays.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
+#[cfg_attr(
+    feature = "builder",
+    derive(Builder),
+    builder(setter(into, strip_option), default)
+)]
 #[serde(rename_all = "camelCase", default)]
 pub struct ArrayValidation {
     /// The `items` keyword.
@@ -426,9 +492,21 @@ pub struct ArrayValidation {
     pub contains: Option<Box<Schema>>,
 }
 
+#[cfg(feature = "builder")]
+impl ArrayValidation {
+    pub fn builder() -> ArrayValidationBuilder {
+        Default::default()
+    }
+}
+
 /// Properties of a [`SchemaObject`] which define validation assertions for objects.
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq, Default)]
 #[cfg_attr(feature = "impl_json_schema", derive(JsonSchema))]
+#[cfg_attr(
+    feature = "builder",
+    derive(Builder),
+    builder(setter(into, strip_option), default)
+)]
 #[serde(rename_all = "camelCase", default)]
 pub struct ObjectValidation {
     /// The `maxProperties` keyword.
@@ -466,6 +544,13 @@ pub struct ObjectValidation {
     /// See [JSON Schema 9.3.2.5. "propertyNames"](https://tools.ietf.org/html/draft-handrews-json-schema-02#section-9.3.2.5).
     #[serde(skip_serializing_if = "Option::is_none")]
     pub property_names: Option<Box<Schema>>,
+}
+
+#[cfg(feature = "builder")]
+impl ObjectValidation {
+    pub fn builder() -> ObjectValidationBuilder {
+        Default::default()
+    }
 }
 
 /// The possible types of values in JSON Schema documents.
